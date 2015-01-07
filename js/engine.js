@@ -1,13 +1,11 @@
 // jscs: disable
 
 var stage, renderer, graphics, props;
-width = 1000
-height = 600
 
 var props = {
 	walls: {
-		depth: 10,
-		shift: 1,
+		depth: 30,
+		shift: 4,
 	},
 	width: 1000,
 	height: 600,
@@ -19,6 +17,11 @@ var vars = {
 	rotation: 0,
 	walls: [],
 	frame: 0, // Frames from 0 to fps - 1
+	colors: {
+		primary: 0xFF0000,
+		secondary: 0x00FF00,
+	},
+	incrementor: {},
 }
 
 var fn = {}
@@ -33,6 +36,10 @@ function logOnce(data, key) {
 
 window.onload = ready
 
+function init() {
+	fn.walls.init();
+}
+
 function ready() {
 	stage = new PIXI.Stage(0xCCCCCC);
 	graphics = new PIXI.Graphics();
@@ -42,18 +49,32 @@ function ready() {
 
 	stage.addChild(graphics)
 
+	init();
 	animate();
+}
+
+function preRender() {
+	vars.frame = (vars.frame + 1) % props.fps;
+	if (vars.frame == 1 || vars.frame == Math.ceil(props.fps/2)) {
+		for (var key in vars.incrementor) {
+			if (vars.incrementor[key] > 0) {
+				vars.incrementor[key] -= 5;
+			}
+		}
+	}
+
+	vars.rotation += props.rotationRate;
+}
+
+function run() {
+	fn.lanes.run();
+	fn.walls.run();
 }
 
 function animate() {
 	requestAnimationFrame(animate);
-
-	vars.frame = (vars.frame + 1) % props.fps;
-
+	preRender();
 	graphics.clear();
-
-	fn.lanes.draw(vars.rotation, 0xFF0000, 0x00FF00);
-	vars.rotation += props.rotationRate;
-
+	run();
 	renderer.render(stage);
 }

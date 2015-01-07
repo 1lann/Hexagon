@@ -13,12 +13,36 @@ fn.tools.getPoints = function(point, dist, sector, angle) {
 	return newPoint;
 }
 
+fn.tools.incrementorRound = function(num) {
+	num = math.floor(num + 0.5)
+	if (num % 10 == 4) {
+		num = num + 1;
+	} else if (num % 10 == 3) {
+		num = num + 2;
+	} else if (num % 10 == 2) {
+		num = num - 2;
+	} else if (num % 10 == 1) {
+		num = num - 1;
+	} else if (num % 10 == 6) {
+		num = num - 1;
+	} else if (num % 10 == 7) {
+		num = num - 2;
+	} else if (num % 10 == 8) {
+		num = num + 2;
+	} else if (num % 10 == 9) {
+		num = num + 1;
+	}
+
+	return num;
+}
+
 fn.tools.drawTrapezium = function(point, dist, depth, sector, rotation, color) {
 	graphics.beginFill(color);
 
 	var path = [
 		fn.tools.getPoints(point, dist + depth, sector, rotation),
 		fn.tools.getPoints(point, dist, sector, rotation),
+		fn.tools.getPoints(point, dist, sector + 1, rotation),
 		fn.tools.getPoints(point, dist + depth, sector + 1, rotation),
 	];
 
