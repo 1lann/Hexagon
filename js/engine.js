@@ -1,5 +1,9 @@
 // jscs: disable
 
+//
+//  Properties and Variables
+//
+
 var stage, renderer, graphics, props;
 
 var props = {
@@ -11,6 +15,23 @@ var props = {
 	height: 600,
 	fps: 60,
 	rotationRate: 1,
+	hexagon: {
+		depth: 5,
+		baseRadius: 50,
+	},
+	player: {
+		sideLength: 12,
+		sideAngle: 28,
+		hexagonSpacing: 25,
+		moveSpeed: 4,
+		twistSpeed: 4,
+		maxTwist: 30,
+	},
+	dir: {
+		none: 0,
+		left: 1,
+		right: 2,
+	}
 }
 
 var vars = {
@@ -18,13 +39,31 @@ var vars = {
 	walls: [],
 	frame: 0, // Frames from 0 to fps - 1
 	colors: {
+		accent: 0xFFFFFF,
 		primary: 0xFF0000,
 		secondary: 0x00FF00,
 	},
 	incrementor: {},
+	// May unify
+	hexagonTwitch: 0,
+	hexagonPulse: 0,
+	player: {
+		positionAngle: 0,
+		dist: 0,
+		twistAngle: 0,
+	},
+	input: {
+		leftDown: false,
+		rightDown: false,
+		direction: props.dir.none,
+	}
 }
 
 var fn = {}
+
+//
+//  Setup
+//
 
 logged = {}
 function logOnce(data, key) {
@@ -35,10 +74,6 @@ function logOnce(data, key) {
 }
 
 window.onload = ready
-
-function init() {
-	fn.walls.init();
-}
 
 function ready() {
 	stage = new PIXI.Stage(0xCCCCCC);
@@ -66,15 +101,25 @@ function preRender() {
 	vars.rotation += props.rotationRate;
 }
 
-function run() {
-	fn.lanes.run();
-	fn.walls.run();
-}
-
 function animate() {
 	requestAnimationFrame(animate);
 	preRender();
 	graphics.clear();
 	run();
 	renderer.render(stage);
+}
+
+//
+//  Init and Run module functions
+//
+
+function init() {
+	fn.walls.init();
+}
+
+function run() {
+	fn.lanes.run();
+	fn.walls.run();
+	fn.hexagon.run();
+	fn.player.run();
 }

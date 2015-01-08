@@ -45,7 +45,7 @@ fn.walls.run = function() {
 		walls = [];
 	}
 
-	fn.walls.draw(props.center, walls, vars.rotation, 0xFFFFFF);
+	fn.walls.draw(props.center, walls, vars.rotation, vars.colors.accent);
 	walls = fn.walls.shift(walls);
 	walls = fn.walls.generate(walls, vars.frame);
 
