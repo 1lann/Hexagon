@@ -9,7 +9,7 @@ fn.tools.toRadians = function(angle) {
 fn.tools.getPoint = function(point, dist, sector, angle) {
 	var newX = point.x + dist * Math.cos(fn.tools.toRadians(sector * 60 + angle));
 	var newY = point.y + dist * Math.sin(fn.tools.toRadians(sector * 60 + angle));
-	var newPoint = new PIXI.Point(newX, newY)
+	var newPoint = new THREE.Vector2(newX, newY)
 	return newPoint;
 }
 
@@ -36,8 +36,40 @@ fn.tools.incrementorRound = function(num) {
 	return num;
 }
 
+fn.tools.makePolygon = function(polygonShape, path) {
+	var lastX = path[0].x;
+	var lastY = path[0].y;
+
+	polygonShape.moveTo(path[0].x, path[0].y);
+
+	for (var i = 1; i < path.length; i++) {
+		if (path[i].x != lastX || path[i].y != lastY) {
+			polygonShape.lineTo(path[i].x, path[i].y);
+			lastX = path[i].x;
+			lastY = path[i].y;
+		}
+	}
+
+	return polygonShape;
+}
+
+fn.tools.fillPolygon = function(polygonShape, color, layer) {
+	var polygonGeometry = new THREE.ShapeGeometry(polygonShape);
+
+	for (var i = 0; i < polygonGeometry.vertices.length; i++) {
+		polygonGeometry.vertices[i].z = layer;
+	}
+
+	var polygonMaterial = new THREE.MeshBasicMaterial({color: color});
+	var polygonMesh = new THREE.Mesh(polygonGeometry, polygonMaterial);
+	garbageDisposer.push(polygonGeometry);
+	garbageDisposer.push(polygonMaterial);
+	garbageRemover.push(polygonMesh);
+	scene.add(polygonMesh);
+}
+
 fn.tools.drawTrapezium = function(point, dist, depth, sector, rotation, color) {
-	graphics.beginFill(color);
+	var trapezium = new THREE.Shape();
 
 	var path = [
 		fn.tools.getPoint(point, dist + depth, sector, rotation),
@@ -46,6 +78,6 @@ fn.tools.drawTrapezium = function(point, dist, depth, sector, rotation, color) {
 		fn.tools.getPoint(point, dist + depth, sector + 1, rotation),
 	];
 
-	graphics.drawPolygon(path);
-	graphics.endFill();
+	trapezium = fn.tools.makePolygon(trapezium, path);
+	fn.tools.fillPolygon(trapezium, color, props.layers.background);
 }
